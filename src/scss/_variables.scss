@@ -1,0 +1,27 @@
+// Lauout
+$content-width: 1120px;
+
+// Colors
+$blue: #00aaea;
+$blue-dark: #20323b;
+$blue-fade: rgba($blue, 0.3);
+$green: #36e400;
+$green-dark: #20291e;
+$red: #df1515;
+$red-dark: #341e1e;
+
+// Greyscale
+$grey-0: #545a5f;
+$grey-1: #323538;
+$grey-2: #232527;
+$grey-3: #1d1e20;
+$grey-4: #141516;
+$almost-black: #151618;
+$black: #000000;
+
+$almost-white: #d8d8d8;
+$white: #ffffff;
+
+// Easings
+$ease: cubic-bezier(0.86,0,0.07,1);
+$quick-ease: 0.2s $ease;

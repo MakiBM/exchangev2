@@ -1,0 +1,117 @@
+// Document
+//
+// 1. Prevent adjustments of font size after orientation changes in IE on Windows Phone and in iOS.
+// 2. Setting @viewport causes scrollbars to overlap content in IE11 and Edge, so
+//    we force a non-overlapping, non-auto-hiding scrollbar to counteract.
+// 3. Change the default tap highlight to be completely transparent in iOS.
+
+html {
+  -webkit-text-size-adjust: 100%; // 1
+  -ms-text-size-adjust: 100%; // 1
+  -ms-overflow-style: scrollbar; // 2
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0); // 3
+}
+
+body {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 100%;
+  font-weight: normal;
+  text-align: left;
+  letter-spacing: 0;
+  line-height: 1.5;
+  text-decoration: none;
+  text-transform: none;
+}
+
+*,
+*:before,
+*:after {
+  appearance: none;
+  border: 0;
+  border-radius: 0;
+  box-sizing: border-box;
+	margin: 0;
+	outline: 0;
+  padding: 0;
+  vertical-align: baseline;
+
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  text-decoration: inherit;
+  text-transform: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+svg:not(:root) {
+  overflow: hidden; // Hide the overflow in IE
+}
+
+// Avoid 300ms click delay on touch devices that support the `touch-action` CSS property.
+//
+// In particular, unlike most other browsers, IE11+Edge on Windows 10 on touch devices and IE Mobile 10-11
+// DON'T remove the click delay when `<meta name="viewport" content="width=device-width">` is present.
+// However, they DO support removing the click delay via `touch-action: manipulation`.
+// See:
+// * https://getbootstrap.com/docs/4.0/content/reboot/#click-delay-optimization-for-touch
+// * https://caniuse.com/#feat=css-touch-action
+// * https://patrickhlauke.github.io/touch/tests/results/#suppressing-300ms-delay
+
+a,
+area,
+button,
+[role="button"],
+input:not([type="range"]),
+label,
+select,
+summary,
+textarea {
+  touch-action: manipulation;
+}
+
+a, button, select {
+  cursor: pointer;
+  color: currentColor;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+// Legacy IE
+
+// IE10+ doesn't honor `<meta name="viewport">` in some cases.
+@at-root {
+  @-ms-viewport {
+    width: device-width;
+  }
+}
+
+// HTML5 display-role reset
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}

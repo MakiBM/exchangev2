@@ -1,0 +1,31 @@
+$font-path-gilroy: '@/assets/fonts/gilroy';
+@include font-face( 'Gilroy', '#{$font-path-gilroy}/gilroy-regularitalic-webfont', normal, italic );
+@include font-face( 'Gilroy', '#{$font-path-gilroy}/gilroy-regular-webfont' );
+@include font-face( 'Gilroy', '#{$font-path-gilroy}/gilroy-bold-webfont', 700, normal );
+@include font-face( 'Gilroy', '#{$font-path-gilroy}/gilroy-black-webfont', 900, normal );
+
+
+body {
+  font-size: 13px;
+  font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;;
+}
+
+strong {
+  font-weight: bold;
+}
+
+small {
+  font-size: 80%;
+}
+
+label {
+  cursor: pointer;
+}
+
+table {
+  table-layout: fixed;
+}
+
+[disabled] {
+  pointer-events: none;
+}

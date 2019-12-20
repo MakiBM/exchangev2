@@ -1,0 +1,108 @@
+$hair-edge: currentColor 0, currentColor 1px, transparent 1px, transparent 100%;
+$hair-center: transparent calc(50% - 0.5px), currentColor calc(50% - 0.5px), currentColor calc(50% + 0.5px), transparent calc(50% + 0.5px);
+
+@mixin crosshair-full($color) {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  color: $color;
+  background:
+    linear-gradient(to bottom, #{$hair-center}),
+    linear-gradient(to right, #{$hair-center});
+}
+
+@mixin crosshair-top-center($color) {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  color: $color;
+  background:
+    linear-gradient(to bottom, #{$hair-edge}),
+    linear-gradient(to right, #{$hair-center});
+}
+
+@mixin crosshair-left-center($color) {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  color: $color;
+  background:
+    linear-gradient(to right, #{$hair-edge}),
+    linear-gradient(to bottom, #{$hair-center});
+}
+
+@mixin crosshair-right-center($color) {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  color: $color;
+  background:
+    linear-gradient(to left, #{$hair-edge}),
+    linear-gradient(to bottom, #{$hair-center});
+}
+
+@mixin crosshair-left-top($color) {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  color: $color;
+  background:
+    linear-gradient(to right, #{$hair-edge}),
+    linear-gradient(to bottom, #{$hair-edge});
+}
+
+@mixin crosshair-right-top($color) {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  color: $color;
+  background:
+    linear-gradient(to left, #{$hair-edge}),
+    linear-gradient(to bottom, #{$hair-edge});
+}
+
+@mixin crosshair-left-bottom($color) {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  color: $color;
+  background:
+    linear-gradient(to right, #{$hair-edge}),
+    linear-gradient(to top, #{$hair-edge});
+}
+
+@mixin crosshair-right-bottom($color) {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  color: $color;
+  background:
+    linear-gradient(to left, #{$hair-edge}),
+    linear-gradient(to top, #{$hair-edge});
+}
+
+// Font Face
+//
+// example: @include font-face( 'Samplino lorem', fonts/Samplino, 900, italic );
+// default types woff2 woff
+
+@mixin font-face($name, $path, $weight: normal, $style: normal, $exts: woff2 woff) {
+  $extmods: (eot: '?',
+      svg: '#'+ str-replace($name, ' ', '_'));
+
+  $formats: (otf: 'opentype',
+      ttf: 'truetype'
+    );
+
+  @each $ext in $exts {
+    $extmod: if(map-has-key($extmods, $ext), $ext + map-get($extmods, $ext), $ext);
+    $format: if(map-has-key($formats, $ext), map-get($formats, $ext), $ext);
+  }
+
+  @font-face {
+    font-family: quote($name);
+    src: $path;
+    font-style: $style;
+    font-weight: $weight;
+  }
+}
