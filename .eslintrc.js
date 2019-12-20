@@ -8,8 +8,8 @@ module.exports = {
     '@vue/standard',
   ],
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'no-console': 'off',
     'comma-dangle': 'off',
     'no-new-object': 'off',
     'no-unmodified-loop-condition': 'off',
