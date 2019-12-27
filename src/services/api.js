@@ -7,12 +7,20 @@ import { getKnownTokens } from '@/services/tokens'
 import { buildApiUrl } from './_utils'
 import store from '@/store'
 
+const pendingRequestsByUrl = {}
+
 const request = async (urlParts, params, method) => {
   const url = buildApiUrl(API_URL, urlParts, params)
+  const CancelToken = axios.CancelToken
+  const source = CancelToken.source()
+  if (pendingRequestsByUrl[url]) pendingRequestsByUrl[url].cancel()
+  pendingRequestsByUrl[url] = source
   const { data, headers } = await axios.get(url, {
     requestId: uuid(),
     method,
+    cancelToken: source.token,
   })
+  delete pendingRequestsByUrl[url]
   const links = headers && headers.link ? parse(headers.link) : {}
   const total = headers['x-page-total'] ? headers['x-page-total'] : null
   return {
