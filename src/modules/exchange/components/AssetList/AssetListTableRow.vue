@@ -18,7 +18,10 @@
       <div class="c-cell-name__row">
         <img
           class="c-cell-name__icon"
-          :src="require(`@/assets/token-symbols/${quoteAsset.toLowerCase()}.svg`)">
+          :src="symbolImage"
+          loading="lazy"
+          width="24"
+          height="24">
         <strong v-if="assetsBySymbol[quoteAsset]">{{ assetsBySymbol[quoteAsset].name }}</strong>
         <TextPlaceholder v-else />
       </div>
@@ -111,6 +114,13 @@ export default {
     cryptoCompareInfoFiat () {
       return this.assetsCryptoCompareInfoSelector(this.quoteAsset, this.preferredCurrencySymbol)
     },
+    symbolImage () {
+      try {
+        return require(`@/assets/token-symbols/${this.quoteAsset.toLowerCase()}.svg`)
+      } catch (e) {
+        return require('@/assets/token-symbols/empty.svg')
+      }
+    },
   },
 }
 </script>
@@ -147,6 +157,7 @@ export default {
 }
 
 .c-cell-name__icon {
+  position: relative;
   width: 24px;
   height: 24px;
   margin-right: 15px;

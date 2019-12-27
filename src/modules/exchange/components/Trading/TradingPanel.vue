@@ -43,7 +43,6 @@ export default {
   border-top: 1px solid $black;
 
   &.-padding { padding: 25px 10px; }
-  &.-border { border-left: 3px solid; }
   &.-light { background: $grey-1; }
   &.-light-2-rows { height: 70px; }
   &.-center { text-align: center; }
@@ -54,9 +53,15 @@ export default {
     justify-content: center;
   }
 
+  &.-total {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  &.-border { border-left: 3px solid; }
+  &.-blue { border-left-color: $blue; }
   .-positive & { border-left-color: $green; }
   .-negative & { border-left-color: $red; }
-  &.-blue { border-left-color: $blue; }
 }
 
 .c-trading-panel__button-wrap {
@@ -72,7 +77,7 @@ export default {
   display: flex;
   align-items: center;
   width: 265px;
-  height: 25px;
+  height: 24px;
   margin: 7px 0;
 
   &.-balance {

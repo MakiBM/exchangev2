@@ -90,14 +90,16 @@ const actions = {
   },
 
   async getQuoteAssetsByMasterSymbol ({ commit }) {
-    commit('setQuoteAssetsByMasterSymbol', await api.getQuoteAssetsByMasterSymbol())
+    const assets = await api.getQuoteAssetsByMasterSymbol()
+    assets.USDC = ['WETH']
+    commit('setQuoteAssetsByMasterSymbol', assets)
   },
 
   async getAssetsCryptoCompareInfo ({ commit, state, rootState }, masterSelected) {
     const { assetsCryptoCompareInfo, assetsBySymbol, quoteAssetsByMasterSymbol, masterPairedSymbol } = state
     const getCcsymbol = symbol => assetsBySymbol[symbol].ccsymbol
     const tsyms = [rootState.preferredCurrencySymbol, getCcsymbol(masterSelected)]
-    const fsyms = [getCcsymbol(masterPairedSymbol), ...quoteAssetsByMasterSymbol[masterSelected].map(getCcsymbol)]
+    const fsyms = ['ETH', 'ZRX', getCcsymbol(masterPairedSymbol), ...quoteAssetsByMasterSymbol[masterSelected].map(getCcsymbol)]
     const newAssetsCryptoCompareInfo = await cryptocompare.getPricemultifull(tsyms, fsyms)
     commit('setAssetsCryptoCompareInfo', deepmerge(assetsCryptoCompareInfo, newAssetsCryptoCompareInfo))
   },

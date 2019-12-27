@@ -93,7 +93,7 @@
         <div class="c-trading-panel__slider"></div>
       </div>
 
-      <div class="c-trading-panel__section -border -grow">
+      <div class="c-trading-panel__section -border -grow -total">
         <div class="__row-spaced">
           Total
           <div class="c-trading-panel__value-wrap">
@@ -120,19 +120,12 @@
             </div>
           </div>
         </div>
-        <div
-          v-if="false"
-          class="__row-spaced">
-          <span></span>
-          <div class="c-trading-panel__value-wrap -balance">
-            <img
-              src="@/assets/icons/failure.svg"
-              svg-inline
-              svg-sprite>
-            Not enough Balance.
-            Wrap 0.0049101930 Ether
-          </div>
-        </div>
+
+        <TradingFormMissingBalance
+          v-if="quoteAmount && !hasEnoughBalance"
+          :hasEnoughEthMissingBalance="hasEnoughEthMissingBalance"
+          :missingBalance="missingBalance" />
+
       </div>
 
       <div class="c-trading-panel__section -light -light-2-rows">
@@ -185,13 +178,14 @@ import { mapState, mapGetters, mapActions } from 'vuex'
 import get from 'lodash/get'
 import includes from 'lodash/fp/includes'
 import { isNumeric, sum } from '@/utils'
-import { toFixed, trimZeros } from '@/filters'
+import { toFixed, trimZeros, toHumanUnit } from '@/filters'
 import { getWeightedAveragePrice } from '@/services/transaction'
 import BaseInput from '@/ui/Input'
 import Button from '@/ui/Button'
 import TransactionConfirm from '@/modules/exchange/ui/TransactionConfirm'
 import TransactionDetails from '@/modules/exchange/ui/TransactionDetails'
 import TradingPanel from './TradingPanel'
+import TradingFormMissingBalance from './TradingFormMissingBalance'
 
 export default {
   name: 'TradingForm',
@@ -202,12 +196,14 @@ export default {
     TradingPanel,
     TransactionConfirm,
     TransactionDetails,
+    TradingFormMissingBalance,
   },
 
   props: {
     orderNamespace: { type: String, required: true },
     orderSideClass: { type: String, required: true },
     balanceAsset: { type: String, required: true },
+    lowestAsk: { type: String },
   },
 
   data () {
@@ -224,7 +220,10 @@ export default {
     ...mapState(['preferredCurrencySymbol']),
     ...mapGetters(['preferredCurrencySign']),
     ...mapState('exchange', ['assetsBySymbol']),
-    ...mapState('exchange/wallet', ['balancesAndAllowancesBySymbol']),
+    ...mapState('exchange/wallet', [
+      'balancesAndAllowancesBySymbol',
+      'ethBalance',
+    ]),
     ...mapState('exchange/market', ['marketsByPair']),
     ...mapState('exchange', [
       'masterPairedSymbol',
@@ -257,7 +256,10 @@ export default {
     },
     marketPrice () {
       const amount = this.market.makerAmount || this.market.takerAmount
-      return !this.market.isFillableRecordsLoading && !amount && this.market.marketPrice
+      const shouldShow = !this.market.isFillableRecordsLoading && !amount
+      return shouldShow && this.isFiat
+        ? BigNumber(this.lowestAsk).multipliedBy(this.masterFiatPrice).toString()
+        : this.lowestAsk
     },
     lastActiveTransaction () {
       const id = get(this.market, 'transactionsSorted[0]')
@@ -265,7 +267,7 @@ export default {
     },
     price () {
       return (this.weightedAveragePrice && this.weightedAveragePrice[this.masterPairedSymbol])
-        || (this.marketPrice && this.marketPrice[this.masterPairedSymbol])
+        || this.marketPrice
     },
     balance () {
       return get(this.balancesAndAllowancesBySymbol, [this.balanceAsset, 'balance'])
@@ -278,6 +280,24 @@ export default {
     },
     balanceAssetPrice () {
       return get(this.assetsCryptoCompareInfoSelector(this.balanceAsset, this.preferredCurrencySymbol), 'PRICE')
+    },
+    hasEnoughBalance () {
+      const amount = this.isBuy
+        ? this.total
+        : this.quoteAmount
+      return BigNumber(this.balanceInHumanUnit).isGreaterThanOrEqualTo(amount)
+    },
+    missingBalance () {
+      const amount = this.isBuy
+        ? this.total
+        : this.quoteAmount
+      const balance = BigNumber(amount).minus(this.balanceInHumanUnit)
+      return balance.isLessThan('0.01')
+        ? '0.01'
+        : balance.toString()
+    },
+    hasEnoughEthMissingBalance () {
+      return this.balanceAsset === 'WETH' && BigNumber(toHumanUnit(this.ethBalance, 18)).isGreaterThanOrEqualTo(this.missingBalance)
     },
     quoteAmount () {
       return this.isBuy

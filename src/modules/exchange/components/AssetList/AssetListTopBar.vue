@@ -1,16 +1,17 @@
 <template>
-  <div class="c-asset-list-top-bar">
+  <div class="c-asset-list-top-bar"
+    @click="toggleShowAssetList">
     <a
       v-for="masterSymbol in mastersSorted"
       :key="`c-asset-list-top-bar__master-asset--${masterSymbol}`"
       :class="{'-active': masterSymbol === masterSelected}"
       class="c-asset-list-top-bar__master-asset"
-      @click="handleClickMaster(masterSymbol)">
+      @click.stop="handleClickMaster(masterSymbol)">
       {{ masterSymbol }}
     </a>
     <a
       class="c-asset-list-top-bar__favs"
-      @click="toggleShowAssetFavs">
+      @click.stop="toggleShowAssetFavs">
       <!-- Put classes to array as of a bug with svg-inline -->
       <img
         :class="[
@@ -24,8 +25,7 @@
     </a>
     <a
       :class="{'-active': showAssetList}"
-      class="c-asset-list-top-bar__toggle-listing"
-      @click="toggleShowAssetList">
+      class="c-asset-list-top-bar__toggle-listing">
       <img
         src="@/assets/icons/carrot.svg"
         svg-inline
@@ -72,6 +72,7 @@ export default {
   font-weight: 700;
   line-height: 1;
   text-transform: uppercase;
+  cursor: pointer;
 }
 
 .c-asset-list-top-bar__master-asset {

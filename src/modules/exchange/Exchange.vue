@@ -20,8 +20,6 @@ import ModalArea from './components/ModalArea/ModalArea.vue'
 import OrderBook from './components/OrderBook/OrderBook.vue'
 import MarketTrades from './components/MarketTrades/MarketTrades.vue'
 import UserTrades from './components/UserTrades/UserTrades.vue'
-// import exchangeStore from './store'
-// const storeModuleName = 'exchange'
 
 export default {
   name: 'Exchange',
@@ -33,11 +31,6 @@ export default {
     OrderBook,
     MarketTrades,
     UserTrades,
-  },
-  beforeCreate () {
-    // if (!(this.$store && this.$store.state && this.$store.state[storeModuleName])) {
-    //   this.$store.registerModule(storeModuleName, exchangeStore)
-    // }
   },
   async mounted () {
     await this.$store.dispatch('exchange/init')

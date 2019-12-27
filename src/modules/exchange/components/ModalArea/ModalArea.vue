@@ -26,6 +26,7 @@ import { mapState } from 'vuex'
 import ModalOnboarding from './ModalOnboarding'
 import ModalStandaloneConnect from './ModalStandaloneConnect'
 import ModalStandalonePermission from './ModalStandalonePermission'
+import ModalStandaloneWethGet from './ModalStandaloneWethGet'
 import ModalPartialFill from './ModalPartialFill'
 import ModalTimePicker from './ModalTimePicker'
 
@@ -35,6 +36,7 @@ export default {
     ModalOnboarding,
     ModalStandaloneConnect,
     ModalStandalonePermission,
+    ModalStandaloneWethGet,
     ModalPartialFill,
     ModalTimePicker,
   },

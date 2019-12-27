@@ -74,6 +74,7 @@
           <ItemFocusArrow v-if="!isButtonDisabled" />
           <template v-if="isStatus(['beforeSign', 'pending'])">Waiting for TX Confirmation</template>
           <template v-else-if="isStatus(['failure'])">Try Again</template>
+          <template v-else-if="isStatus(['success']) && isStandalone">Continue Trading</template>
           <template v-else-if="isStatus(['success'])">Next Step</template>
           <template v-else>
             <img
@@ -128,6 +129,7 @@ import ModalInnerInfo from './ModalInnerInfo'
 import ItemFocusArrow from '@/modules/exchange/ui/ItemFocusArrow'
 import TransactionConfirm from '@/modules/exchange/ui/TransactionConfirm'
 import TransactionDetails from '@/modules/exchange/ui/TransactionDetails'
+import { STANDALONE_WETH_GET } from './constants'
 
 export default {
   name: 'ModalOnboardingWethGet',
@@ -184,10 +186,14 @@ export default {
       return (this.isStatus([undefined]) && !this.isValidInput)
         || this.isStatus(['beforeSign', 'pending'])
     },
+    isStandalone () {
+      return !this.$attrs.rightNav
+    },
   },
 
-  mounted () {
-    this.cleanUp()
+  async mounted () {
+    await this.cleanUp()
+    if (this.$attrs.onmounted) this.$attrs.onmounted()
   },
 
   beforeDestroy () {
@@ -220,8 +226,10 @@ export default {
     handleButtonClick () {
       // Try Again
       if (this.isStatus(['failure'])) this.setTransaction({ status: undefined })
+      // Continue Trading
+      else if (this.isStatus(['success']) && this.isStandalone) this.removeOpenedModal(STANDALONE_WETH_GET)
       // Next Step
-      else if (this.isStatus(['success']) && this.$attrs.rightNav) this.$attrs.rightNav.onclick()
+      else if (this.isStatus(['success'])) this.$attrs.rightNav.onclick()
       // Wrap / Unwarp
       else this.sendTransaction()
     },
@@ -248,6 +256,7 @@ export default {
   color: $white;
   margin: 0 auto;
   margin-bottom: 20px;
+  transform: translateX(-10px);
 }
 
 .c-modal-weth-get__separator {

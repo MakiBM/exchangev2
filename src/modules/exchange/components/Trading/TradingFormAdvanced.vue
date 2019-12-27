@@ -42,7 +42,9 @@
                 {{ lowestAsk | toFixed(8) }}
               </template>
             </strong>
-            <TextPlaceholder v-else />
+            <template v-else>
+              -
+            </template>
             {{ masterPairedSymbol }}
           </div>
         </div>
@@ -73,7 +75,7 @@
         <div class="c-trading-panel__slider"></div>
       </div>
 
-      <div class="c-trading-panel__section -border -grow">
+      <div class="c-trading-panel__section -total -border -grow">
         <div class="__row-spaced">
           Total
           <div class="c-trading-panel__value-wrap">
@@ -97,19 +99,12 @@
             </BaseInput>
           </div>
         </div>
-        <div
-          v-if="false"
-          class="__row-spaced">
-          <span></span>
-          <div class="c-trading-panel__value-wrap -balance">
-            <img
-              src="@/assets/icons/failure.svg"
-              svg-inline
-              svg-sprite>
-            Not enough Balance.
-            Wrap 0.0049101930 Ether
-          </div>
-        </div>
+
+        <TradingFormMissingBalance
+          v-if="amounts[balanceAsset] && !hasEnoughBalance"
+          :hasEnoughEthMissingBalance="hasEnoughEthMissingBalance"
+          :missingBalance="missingBalance" />
+
       </div>
 
       <FeeAndExpiration
@@ -142,13 +137,13 @@ import isUndefined from 'lodash/isUndefined'
 import includes from 'lodash/fp/includes'
 import { addDays } from 'date-fns'
 import { isNumeric } from '@/utils'
-import { toFixed, trimZeros } from '@/filters'
+import { toFixed, trimZeros, toHumanUnit } from '@/filters'
 import BaseInput from '@/ui/Input'
 import Button from '@/ui/Button'
-import TextPlaceholder from '@/ui/TextPlaceholder'
 import FeeAndExpiration from '@/modules/exchange/ui/FeeAndExpiration'
 import TransactionConfirm from '@/modules/exchange/ui/TransactionConfirm'
 import TradingPanel from './TradingPanel'
+import TradingFormMissingBalance from './TradingFormMissingBalance'
 
 export default {
   name: 'TradingForm',
@@ -157,9 +152,9 @@ export default {
     BaseInput,
     Button,
     TradingPanel,
-    TextPlaceholder,
     TransactionConfirm,
     FeeAndExpiration,
+    TradingFormMissingBalance,
   },
 
   props: {
@@ -175,7 +170,6 @@ export default {
       toFixed,
       trimZeros,
       BigNumber,
-      quoteAmount: undefined,
     }
   },
 
@@ -194,6 +188,7 @@ export default {
     ...mapState('exchange/wallet', [
       'balancesAndAllowancesBySymbol',
       'ethAccount',
+      'ethBalance',
     ]),
     ...mapState('exchange/trading', [
       'orderMode',
@@ -242,6 +237,9 @@ export default {
         ? BigNumber(this.lowestAsk).multipliedBy(this.masterFiatPrice).toString()
         : this.lowestAsk
     },
+    quoteAmount () {
+      return get(this.market, `amounts.${this.quotePairedSymbol}`)
+    },
     userPrice () {
       return get(this.market, 'userPrice')
     },
@@ -268,6 +266,24 @@ export default {
     },
     balanceAssetPrice () {
       return get(this.assetsCryptoCompareInfoSelector(this.balanceAsset, this.preferredCurrencySymbol), 'PRICE')
+    },
+    hasEnoughBalance () {
+      const amount = this.isBuy
+        ? this.total
+        : this.amounts[this.balanceAsset]
+      return BigNumber(this.balanceInHumanUnit).isGreaterThanOrEqualTo(amount)
+    },
+    missingBalance () {
+      const amount = this.isBuy
+        ? this.total
+        : this.amounts[this.balanceAsset]
+      const balance = BigNumber(amount).minus(this.balanceInHumanUnit)
+      return balance.isLessThan('0.01')
+        ? '0.01'
+        : balance.toString()
+    },
+    hasEnoughEthMissingBalance () {
+      return this.balanceAsset === 'WETH' && BigNumber(toHumanUnit(this.ethBalance, 18)).isGreaterThanOrEqualTo(this.missingBalance)
     },
     total () {
       if (parseFloat(this.price) && isNumeric(this.price) && isNumeric(this.quoteAmount)) {
@@ -336,7 +352,13 @@ export default {
       })
     },
     setQuoteAmount (value) {
-      this.quoteAmount = value
+      this.setMarketProps({
+        pair: this.pair,
+        amounts: {
+          [this.quotePairedSymbol]: value,
+          [this.masterPairedSymbol]: this.amounts[this.masterPairedSymbol],
+        },
+      })
     },
     setStatus (status) {
       this.setMarketProps({

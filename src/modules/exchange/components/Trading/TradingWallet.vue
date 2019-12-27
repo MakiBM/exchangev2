@@ -36,7 +36,9 @@
               class="c-trading-wallet__item-emblem"
               :src="require(`@/assets/token-symbols/eth.svg`)">
             <strong>ETH</strong>
-            <a class="c-trading-wallet__item-link __link">
+            <a
+              class="c-trading-wallet__item-link __link"
+              @click="handleClickWethGet">
               <img
                 src="@/assets/icons/arrow-double.svg"
                 svg-inline
@@ -69,7 +71,8 @@
               <strong>{{ item.token.symbol }}</strong>
               <a
                 v-if="item.token.symbol === 'WETH'"
-                class="c-trading-wallet__item-link __link">
+                class="c-trading-wallet__item-link __link"
+                @click="handleClickWethGet">
                 <img
                   src="@/assets/icons/arrow-double.svg"
                   svg-inline
@@ -110,6 +113,8 @@
               class="c-trading-wallet__item-label -dark"
               :rightLabel="item.token.symbol"
               :checked="item.isUnlocked"
+              :isLoading="isAllowancePending(item.token.symbol)"
+              :withSpinner="true"
               :isAllowances="true"
               @click.native="handleClickToggle(item.token.symbol)" />
             <strong class="c-trading-wallet__item-balance">
@@ -169,7 +174,7 @@ import Avatar from '@/ui/Avatar'
 import Toggle from '@/ui/Toggle'
 import TruncatedText from '@/ui/TruncatedText'
 import TradingPanel from './TradingPanel'
-import { STANDALONE_PERMISSION } from '@/modules/exchange/components/ModalArea/constants'
+import { STANDALONE_PERMISSION, STANDALONE_WETH_GET } from '@/modules/exchange/components/ModalArea/constants'
 
 export default {
   name: 'TradingWallet',
@@ -189,16 +194,25 @@ export default {
     ...mapState(['preferredCurrencySymbol']),
     ...mapGetters(['preferredCurrencySign']),
     ...mapGetters('exchange', ['assetsCryptoCompareInfoSelector']),
-    ...mapState('exchange', ['masterPairedSymbol']),
-    ...mapState('exchange/trading', ['isBalance']),
+    ...mapState('exchange', [
+      'masterPairedSymbol',
+      'quotePairedSymbol',
+    ]),
+    ...mapState('exchange/trading', [
+      'isBalance'
+    ]),
     ...mapState('exchange/wallet', [
       'ethAccount',
       'ethBalance',
       'balancesAndAllowancesBySymbol',
     ]),
+    ...mapState('exchange/allowances', [
+      'allowancesTransactionsBySymbol',
+      'allowancesTransactionsSorted',
+    ]),
     tokens () {
       const walletTokens = Object.keys(this.balancesAndAllowancesBySymbol)
-      if (this.masterPairedSymbol !== 'WETH') pull(walletTokens, 'WETH')
+      if (this.masterPairedSymbol !== 'WETH' && this.quotePairedSymbol !== 'WETH') pull(walletTokens, 'WETH')
       return walletTokens.map(symbol => {
         const item = this.balancesAndAllowancesBySymbol[symbol]
         const price = this.assetsCryptoCompareInfoSelector(symbol, this.preferredCurrencySymbol).PRICE
@@ -216,6 +230,11 @@ export default {
       return BigNumber.sum.apply(null, [...values, this.ethValue])
     },
   },
+
+  mounted () {
+    this.purgeAllowancesTransaction(this.allowancesTransactionsSorted)
+  },
+
   methods: {
     ...mapActions('exchange/wallet', [
       'reset',
@@ -227,8 +246,15 @@ export default {
       'setIsOnboardingActive',
       'addOpenedModal',
     ]),
+    ...mapActions('exchange/allowances', [
+      'purgeAllowancesTransaction',
+    ]),
     ...mapActions('exchange/allowances', ['toggleAllowances']),
     ...mapMutations('exchange/allowances', ['setActiveSymbol']),
+    isAllowancePending (symbol) {
+      const tx = this.allowancesTransactionsBySymbol[symbol] || {}
+      return tx.status === 'pending'
+    },
     handleDisconnect () {
       this.reset()
     },
@@ -252,6 +278,12 @@ export default {
         data: {
           symbols: map(this.tokens, get('token.symbol')),
         },
+      })
+    },
+    handleClickWethGet () {
+      this.addOpenedModal({
+        id: STANDALONE_WETH_GET,
+        component: 'ModalStandaloneWethGet',
       })
     },
   },

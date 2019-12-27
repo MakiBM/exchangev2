@@ -8,10 +8,10 @@
       {label: 'Volume', width: '20%', sortable: true},
       {label: 'Change', width: '13%', sortable: true},
     ]"
-    :visibleRows="10"
+    :visibleRows="8"
     :isLoading="isLoading"
     :sort="assetListSort"
-    :emptyText="showAssetList ? 'No assets to list' : ''"
+    emptyText="No assets to list"
     @sort="handleSort"
     @click.native="handleClickDelegation">
 
@@ -58,18 +58,15 @@ export default {
     ]),
     ...mapState('exchange/assetList', [
       'assetListSort',
-      'showAssetList',
       'showAssetFavs',
       'favsByMaster',
       'masterSelected',
     ]),
     quoteAssetList () {
-      if (this.showAssetList) {
-        const favsByMasterList = this.favsByMaster[this.masterSelected]
-        if (this.showAssetFavs && favsByMasterList && favsByMasterList.length) return favsByMasterList
-        else if (this.quoteAssetsByMasterSymbol[this.masterSelected]) return this.quoteAssetsByMasterSymbol[this.masterSelected]
-      }
-      return []
+      const favsByMasterList = this.favsByMaster[this.masterSelected]
+      if (this.showAssetFavs && favsByMasterList && favsByMasterList.length) return favsByMasterList
+      else if (this.quoteAssetsByMasterSymbol[this.masterSelected]) return this.quoteAssetsByMasterSymbol[this.masterSelected]
+      else return []
     },
     quoteAssetListSorted () {
       const cryptoCompareInfo = field => quoteAsset => get(this.assetsCryptoCompareInfoSelector(quoteAsset, this.masterSelected), [field], 0)

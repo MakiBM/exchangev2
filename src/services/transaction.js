@@ -9,6 +9,7 @@ import api from './api'
 import { getContractWrappers } from './contractWrappers'
 import { getGasEstimationInfoAsync } from './gasEstimator'
 import { sum } from '@/utils'
+import { sleep } from './_utils'
 
 export const calculateRatioAmount = (dividend, divisor, amount) => {
   const ratio = BigNumber(dividend).dividedBy(divisor)
@@ -20,6 +21,17 @@ export const validateRecords = async (records = []) => {
   const signedOrders = records.map(rec => rec.order)
   const ordersInfo = await contractWrappers.exchange.getOrdersInfoAsync(signedOrders)
   return records.filter((rec, i) => ordersInfo[i].orderStatus === OrderStatus.Fillable)
+}
+
+export const sortRecords = (feeRecipientAddress) => (recordA, recordB) => {
+  const tradePriceA = BigNumber(recordA.metaData.tradePrice)
+  const tradePriceB = BigNumber(recordB.metaData.tradePrice)
+  const comparison = tradePriceB.comparedTo(tradePriceA)
+  // If both values are equal compare feeRecipientAddress to promote our orders
+  if (comparison === 0) {
+    return recordA.order.feeRecipientAddress === feeRecipientAddress ? -1 : 1
+  }
+  return comparison
 }
 
 export const getFillableRecordsByAmountAndRole = async ({ makerAssetSymbol, takerAssetSymbol, fillAmount, fillSide }) => {
@@ -161,14 +173,18 @@ export const getTxOpts = async () => {
 }
 
 export const getTransactionFilledAmounts = async (txHash) => {
-  try {
-    const { data } = await api.getTransactionTransfers(txHash)
-    return flow([
-      groupBy('symbol'),
-      mapValues(map(get('value'))),
-      mapValues(sum),
-    ])(data)
-  } catch (e) {
-    setTimeout(() => getTransactionFilledAmounts(txHash), 1000)
+  // run until api endpoint is updated and doesn't return 404. Then we return our thing
+  while (true) {
+    try {
+      const { data } = await api.getTransactionTransfers(txHash)
+      const getFilledAmountsBySymbol = flow([
+        groupBy('symbol'),
+        mapValues(map(get('value'))),
+        mapValues(sum),
+      ])
+      return getFilledAmountsBySymbol(data)
+    } catch (e) {
+      await sleep(1000)
+    }
   }
 }

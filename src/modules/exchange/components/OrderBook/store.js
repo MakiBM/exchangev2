@@ -114,7 +114,6 @@ const actions = {
       recordsSorted: state.buyOrdersSorted,
       setRecordsByHash: 'setBuyOrdersByHash',
       setRecordsSorted: 'setBuyOrdersSorted',
-      priceSort: -1, // asc
       records,
     })
     dispatch('setBuyOrdersSums')
@@ -126,7 +125,6 @@ const actions = {
       recordsSorted: state.sellOrdersSorted,
       setRecordsByHash: 'setSellOrdersByHash',
       setRecordsSorted: 'setSellOrdersSorted',
-      priceSort: 1, // desc
       records,
     })
     dispatch('setSellOrdersSums')
@@ -134,7 +132,7 @@ const actions = {
 
   addRecords ({ commit, rootState }, payload) {
     const { masterPairedSymbol, quotePairedSymbol } = rootState.exchange
-    const { records, recordsByHash, recordsSorted, setRecordsByHash, setRecordsSorted, priceSort } = payload
+    const { records, recordsByHash, recordsSorted, setRecordsByHash, setRecordsSorted } = payload
 
     const extendedRecords = records.map(rec => {
       const { makerAsset, takerAsset } = rec.metaData
@@ -158,7 +156,7 @@ const actions = {
     }
     commit(setRecordsByHash, newRecordsByHash)
 
-    const sortScenario = hash => newRecordsByHash[hash].metaData.masterPrice * priceSort
+    const sortScenario = hash => newRecordsByHash[hash].metaData.tradePrice
     const transformRecords = flow([
       uniq, // drop duplicates
       sortBy(sortScenario), // sort

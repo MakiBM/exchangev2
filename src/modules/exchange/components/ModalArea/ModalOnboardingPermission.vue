@@ -121,7 +121,7 @@ export default {
   async mounted () {
     this.isPurging = true
     if (this.isSingle) this.setActiveSymbol(this.$attrs.symbols[0])
-    await this.purgeAllowancesTransaction(this.activeSymbol)
+    await this.purgeAllowancesTransaction(this.$attrs.symbols)
     this.isPurging = false
     if (this.$attrs.onmounted) this.$attrs.onmounted()
   },
@@ -131,6 +131,7 @@ export default {
       this.removeAllowancesTransaction(this.activeSymbol)
       this.setActiveSymbol(undefined)
     }
+    this.purgeAllowancesTransaction(this.$attrs.symbols)
   },
 
   methods: {

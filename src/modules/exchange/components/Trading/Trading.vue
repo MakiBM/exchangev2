@@ -38,6 +38,7 @@
           v-else-if="orderMode === ORDER_MODE_MARKET"
           orderNamespace="buy"
           orderSideClass="-positive"
+          :lowestAsk="sellOrdersBestPrice"
           :balanceAsset="masterPairedSymbol" />
         <TradingFormAdvanced
           v-else-if="orderMode === ORDER_MODE_ADVANCED"
@@ -65,6 +66,7 @@
           v-else-if="orderMode === ORDER_MODE_MARKET"
           orderNamespace="sell"
           orderSideClass="-negative"
+          :lowestAsk="buyOrdersBestPrice"
           :balanceAsset="quotePairedSymbol" />
         <TradingFormAdvanced
           v-else-if="orderMode === ORDER_MODE_ADVANCED"

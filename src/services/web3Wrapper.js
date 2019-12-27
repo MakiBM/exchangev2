@@ -1,5 +1,6 @@
 import { Web3Wrapper } from '@0x/web3-wrapper'
 import { sleep } from './_utils'
+import { getProvider } from '@/services/provider'
 
 let web3Wrapper = null
 
@@ -17,9 +18,11 @@ export const initializeWeb3Wrapper = async () => {
     return web3Wrapper
   }
 
+  const provider = await getProvider()
+
   if (ethereum) {
     try {
-      web3Wrapper = new Web3Wrapper(ethereum)
+      web3Wrapper = new Web3Wrapper(provider)
       // Request account access if needed
       await ethereum.enable()
 
@@ -31,19 +34,18 @@ export const initializeWeb3Wrapper = async () => {
       ethereum.on('networkChanged', async (network) => {
         location.reload()
       })
-
-      return web3Wrapper
     } catch (error) {
       // The user denied account access
-      return null
+      destroyWeb3Wrapper()
     }
   } else if (web3) {
-    web3Wrapper = new Web3Wrapper(web3.currentProvider)
-    return web3Wrapper
+    web3Wrapper = new Web3Wrapper(provider)
   } else {
     //  The user does not have metamask installed
-    return null
+    destroyWeb3Wrapper()
   }
+
+  return web3Wrapper
 }
 
 export const getWeb3Wrapper = async () => {

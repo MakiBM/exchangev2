@@ -83,18 +83,20 @@ const actions = {
     commit('setAllowancesTransactionsSorted', without(allowancesTransactionsSorted, symbol))
   },
 
-  async purgeAllowancesTransaction ({ dispatch, state }, symbol) {
+  async purgeAllowancesTransaction ({ dispatch, state }, symbols) {
     const { allowancesTransactionsBySymbol } = state
-    const transaction = get(allowancesTransactionsBySymbol, [symbol], {})
-    if (transaction.txHash) {
-      const { data } = await api.getTransaction(transaction.txHash)
-      const { block_id } = data
-      if (block_id) dispatch('removeAllowancesTransaction', symbol)
-      else {
-        dispatch('awaitTransaction', symbol)
+    for (const symbol of symbols) {
+      const transaction = get(allowancesTransactionsBySymbol, [symbol], {})
+      if (transaction.txHash) {
+        const { data } = await api.getTransaction(transaction.txHash)
+        const { block_id } = data
+        if (block_id) dispatch('removeAllowancesTransaction', symbol)
+        else {
+          dispatch('awaitTransaction', symbol)
+        }
+      } else {
+        dispatch('removeAllowancesTransaction', symbol)
       }
-    } else {
-      dispatch('removeAllowancesTransaction', symbol)
     }
   },
 

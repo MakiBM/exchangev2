@@ -223,11 +223,11 @@ const actions = {
     try {
       const web3Wrapper = await getWeb3Wrapper()
       const { status, gasUsed, blockNumber } = await web3Wrapper.awaitTransactionSuccessAsync(transaction.txHash)
-      await this.dispatch('exchange/wallet/updateBalances')
       if (status) {
         const filledAmounts = await getTransactionFilledAmounts(transaction.txHash)
         dispatch('setTransaction', { pair, id, filledAmounts })
       }
+      await this.dispatch('exchange/wallet/updateBalances')
       // Transaction summary
       dispatch('setTransaction', {
         status: status === 1 ? 'success' : 'failure',

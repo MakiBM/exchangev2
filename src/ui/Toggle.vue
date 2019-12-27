@@ -22,6 +22,12 @@
           src="@/assets/icons/checkmark.svg"
           svg-inline
           svg-sprite>
+        <img
+          v-if="isLoading && withSpinner"
+          class="c-toggle__spinner"
+          src="@/assets/icons/spinner.svg"
+          svg-inline
+          svg-sprite>
       </div>
     </div>
     <strong
@@ -40,6 +46,7 @@ export default {
     leftLabel: String,
     rightLabel: String,
     checked: Boolean,
+    withSpinner: Boolean,
     isLoading: Boolean,
     isAllowances: Boolean,
   },
@@ -125,7 +132,10 @@ export default {
 
 .c-toggle__spinner {
   position: absolute;
-  width: 30px;
-  height: 30px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px;
+  height: 28px;
 }
 </style>

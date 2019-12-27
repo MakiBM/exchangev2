@@ -1,12 +1,17 @@
-window.store.commit('exchange/wallet/setAllowancesTransactionsBySymbol', { ZRX: { status: 'beforeSign' } })
-window.store.commit('exchange/wallet/setAllowancesTransactionsBySymbol', { ZRX: {
+// Allowances
+window.store.dispatch('exchange/allowances/setAllowancesTransaction', {
+  symbol: 'USDC',
+  status: 'beforeSign',
+})
+window.store.dispatch('exchange/allowances/setAllowancesTransaction', {
+  symbol: 'USDC',
   status: 'pending',
   txHash: '0xf5d8858fa800f8368b7f58ff4b70381c89710ebc57572855b1b42457296b7b93',
   timestamp: Date.now(),
   blockNumber: 666,
   gasUsed: 110195,
   gasPrice: '1000000000',
-} })
+})
 
 // 1. BUY ORDER
 // 1.1 Market Order fill form for

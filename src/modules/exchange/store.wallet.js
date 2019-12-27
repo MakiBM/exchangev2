@@ -1,5 +1,6 @@
 import { NETWORK_ID } from '@/config'
 import storage from '@/services/storage'
+import eventBus from '@/services/eventBus'
 import { tokensToTokenBalances } from '@/services/tokens'
 import { isMetamaskInstalled, initializeWeb3Wrapper, destroyWeb3Wrapper, getWeb3Wrapper } from '@/services/web3Wrapper'
 import { WEB3STATE_ERROR, WEB3STATE_LOCKED, WEB3STATE_UNLOCKED, WEB3STATE_NOT_INSTALLED, WALLET_METAMASK } from './constants'
@@ -30,6 +31,10 @@ const actions = {
   async init ({ dispatch, state }) {
     const { wallet } = state
     if (wallet === WALLET_METAMASK) dispatch('connectMetamask')
+
+    eventBus.on('pairedSymbolsChanged', () => {
+      dispatch('updateBalances')
+    })
   },
 
   reset ({ commit }) {
@@ -41,7 +46,6 @@ const actions = {
 
   async connectMetamask ({ commit, dispatch }) {
     commit('setWeb3State', WEB3STATE_LOCKED)
-    commit('setWallet', WALLET_METAMASK)
     try {
       const web3Wrapper = await initializeWeb3Wrapper()
       if (web3Wrapper) {
@@ -50,6 +54,7 @@ const actions = {
           commit('setEthAccount', ethAccount)
           dispatch('updateBalances')
           commit('setWeb3State', WEB3STATE_UNLOCKED)
+          commit('setWallet', WALLET_METAMASK)
         }
         const networkId = await web3Wrapper.getNetworkIdAsync()
         if (networkId !== NETWORK_ID) commit('setWeb3State', WEB3STATE_ERROR)

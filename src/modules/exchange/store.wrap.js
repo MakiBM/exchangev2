@@ -87,8 +87,6 @@ const actions = {
       if (!transaction) return
       const web3Wrapper = await getWeb3Wrapper()
       const { status, gasUsed, blockNumber } = await web3Wrapper.awaitTransactionSuccessAsync(transaction.txHash)
-      const info = await web3Wrapper.getBlockIfExistsAsync(blockNumber)
-      console.log(transaction, info)
       await this.dispatch('exchange/wallet/updateBalances')
       // Transaction summary
       dispatch('setTransaction', {

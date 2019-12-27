@@ -11,9 +11,9 @@
         svg-inline>
     </div>
     <div class="c-asset-list__scroller">
-      <AssetListTopBar/>
-      <AssetListTable/>
-      <AssetListHighlights/>
+      <AssetListTopBar />
+      <AssetListTable v-if="showAssetList" />
+      <AssetListHighlights />
     </div>
   </div>
 </template>
@@ -36,7 +36,10 @@ export default {
       'assetsBySymbol',
       'masterPairedSymbol',
       'quotePairedSymbol',
-    ])
+    ]),
+    ...mapState('exchange/assetList', [
+      'showAssetList',
+    ]),
   },
 }
 </script>
