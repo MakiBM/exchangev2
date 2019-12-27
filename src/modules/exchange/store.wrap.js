@@ -1,5 +1,5 @@
 import { BigNumber } from '0x.js'
-import api from '@/services/api'
+import { getTransaction } from '@/services/api'
 import storage from '@/services/storage'
 import { getKnownTokens } from '@/services/tokens'
 import { getContractWrappers } from '@/services/contractWrappers'
@@ -25,7 +25,7 @@ const actions = {
   async purgeTransaction ({ dispatch, state }) {
     const { transaction } = state
     if (transaction.txHash) {
-      const { data } = await api.getTransaction(transaction.txHash)
+      const { data } = await getTransaction(transaction.txHash)
       const { block_id } = data
       if (block_id) dispatch('resetTransaction')
       else dispatch('awaitTransaction')

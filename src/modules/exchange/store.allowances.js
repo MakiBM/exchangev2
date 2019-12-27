@@ -4,7 +4,7 @@ import omit from 'lodash/omit'
 import without from 'lodash/without'
 import { getContractWrappers } from '@/services/contractWrappers'
 import { getTxOpts } from '@/services/transaction'
-import api from '@/services/api'
+import { getTransaction } from '@/services/api'
 import storage from '@/services/storage'
 import { getWeb3Wrapper } from '@/services/web3Wrapper'
 
@@ -88,7 +88,7 @@ const actions = {
     for (const symbol of symbols) {
       const transaction = get(allowancesTransactionsBySymbol, [symbol], {})
       if (transaction.txHash) {
-        const { data } = await api.getTransaction(transaction.txHash)
+        const { data } = await getTransaction(transaction.txHash)
         const { block_id } = data
         if (block_id) dispatch('removeAllowancesTransaction', symbol)
         else {

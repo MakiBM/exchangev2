@@ -7,7 +7,7 @@ import without from 'lodash/without'
 import { toBaseUnit } from '@/filters'
 import { getContractWrappers } from '@/services/contractWrappers'
 import { getFillableRecords, getTxOpts, getTransactionFilledAmounts } from '@/services/transaction'
-import api from '@/services/api'
+import { getOrderbook, getTransaction } from '@/services/api'
 import storage from '@/services/storage'
 import eventBus from '@/services/eventBus'
 import { getWeb3Wrapper } from '@/services/web3Wrapper'
@@ -75,7 +75,7 @@ const actions = {
   async getMarketPrice ({ dispatch }, pair) {
     const assetsBySymbol = (await getKnownTokens()).bySymbol
     const [makerAssetSymbol, takerAssetSymbol] = pair.split('/')
-    const { data } = await api.getOrderbook(pair, { perPage: 1 })
+    const { data } = await getOrderbook(pair, { perPage: 1 })
     const record = data.asks.records[0]
     if (record) {
       const { makerAssetAmount, takerAssetAmount } = record.order
@@ -166,7 +166,7 @@ const actions = {
     transactionsSorted.forEach(async id => {
       const transaction = transactionsById[id]
       if (transaction.txHash) {
-        const { data } = await api.getTransaction(transaction.txHash)
+        const { data } = await getTransaction(transaction.txHash)
         const { block_id } = data
         if (block_id) dispatch('removeTransaction', { pair, id })
         else dispatch('awaitTransaction', { pair, id })

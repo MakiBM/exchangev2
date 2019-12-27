@@ -7,7 +7,7 @@ import { w3cwebsocket as WebSocketClient } from 'websocket'
 import get from 'lodash/get'
 import difference from 'lodash/difference'
 import uuid from 'uuid/v1'
-import api from '@/services/api'
+import { getOrdersHistory } from '@/services/api'
 import eventBus from '@/services/eventBus'
 import { WEBSOCKET_URL, MAINNET_ID, ERC20_ID } from '@/config'
 
@@ -66,7 +66,7 @@ const actions = {
 
   async getPage ({ dispatch, rootState }, page) {
     dispatch('setIsLoading', true)
-    const response = await api.getOrdersHistory({
+    const response = await getOrdersHistory({
       baseAssetAddress: rootState.exchange.assetsBySymbol[rootState.exchange.masterPairedSymbol].contract_address,
       quoteAssetAddress: rootState.exchange.assetsBySymbol[rootState.exchange.quotePairedSymbol].contract_address,
       page,

@@ -5,7 +5,7 @@ import flow from 'lodash/flow'
 import groupBy from 'lodash/fp/groupBy'
 import map from 'lodash/fp/map'
 import mapValues from 'lodash/fp/mapValues'
-import api from './api'
+import { getTransactionTransfers, getOrderbook } from './api'
 import { getContractWrappers } from './contractWrappers'
 import { getGasEstimationInfoAsync } from './gasEstimator'
 import { sum } from '@/utils'
@@ -41,7 +41,7 @@ export const getFillableRecordsByAmountAndRole = async ({ makerAssetSymbol, take
   let page = 1
 
   while (page) {
-    const { links, data } = await api.getOrderbook(`${makerAssetSymbol}/${takerAssetSymbol}`, { page, perPage: 10, })
+    const { links, data } = await getOrderbook(`${makerAssetSymbol}/${takerAssetSymbol}`, { page, perPage: 10, })
     const records = await validateRecords(data.asks.records)
     page = get('next.page', links)
 
@@ -176,7 +176,7 @@ export const getTransactionFilledAmounts = async (txHash) => {
   // run until api endpoint is updated and doesn't return 404. Then we return our thing
   while (true) {
     try {
-      const { data } = await api.getTransactionTransfers(txHash)
+      const { data } = await getTransactionTransfers(txHash)
       const getFilledAmountsBySymbol = flow([
         groupBy('symbol'),
         mapValues(map(get('value'))),

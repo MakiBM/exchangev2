@@ -5,7 +5,7 @@ import take from 'lodash/fp/take'
 import uniq from 'lodash/uniq'
 import flow from 'lodash/flow'
 import get from 'lodash/get'
-import api from '@/services/api'
+import { getOrderbook } from '@/services/api'
 import eventBus from '@/services/eventBus'
 import { toHumanUnit } from '@/filters'
 
@@ -84,15 +84,15 @@ const actions = {
     dispatch('setIsLoading', true)
     // Fetch buy and fetch orders separately so we get trade side orders through `asks` which guarantees
     // correct sort. We need to have things sorted from response especially for paginated results
-    const sellBook = await api.getOrderbook(`${quotePairedSymbol}/${masterPairedSymbol}`, { perPage, page })
+    const sellBook = await getOrderbook(`${quotePairedSymbol}/${masterPairedSymbol}`, { perPage, page })
     dispatch('addSellOrders', sellBook.data.asks.records)
     dispatch('setSellOrdersTotal', sellBook.data.asks.total)
     dispatch('setSellOrdersVolume', sellBook.data.asks_volume)
-    const buyBook = await api.getOrderbook(`${masterPairedSymbol}/${quotePairedSymbol}`, { perPage, page })
-    dispatch('addBuyOrders', buyBook.data.asks.records)
-    dispatch('setBuyOrdersTotal', buyBook.data.asks.total)
-    dispatch('setBuyOrdersVolume', buyBook.data.asks_volume)
-    dispatch('setNextPage', get(buyBook.links, ['next', 'page']))
+    // const buyBook = await getOrderbook(`${masterPairedSymbol}/${quotePairedSymbol}`, { perPage, page })
+    dispatch('addBuyOrders', sellBook.data.bids.records)
+    dispatch('setBuyOrdersTotal', sellBook.data.bids.total)
+    dispatch('setBuyOrdersVolume', sellBook.data.bids_volume)
+    dispatch('setNextPage', get(sellBook.links, ['next', 'page']))
     dispatch('setIsLoading', false)
   },
 

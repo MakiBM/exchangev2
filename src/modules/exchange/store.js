@@ -1,11 +1,10 @@
 import deepmerge from 'deepmerge'
 import get from 'lodash/get'
 // Services
-import api from '@/services/api'
 import cryptocompare from '@/services/cryptocompare'
 import storage from '@/services/storage'
 import eventBus from '@/services/eventBus'
-import { getKnownTokens } from '@/services/tokens'
+import { getKnownTokens, getQuoteAssetsByMasterSymbol } from '@/services/tokens'
 // Modules
 import wallet from './store.wallet'
 import market from './store.market'
@@ -90,7 +89,7 @@ const actions = {
   },
 
   async getQuoteAssetsByMasterSymbol ({ commit }) {
-    const assets = await api.getQuoteAssetsByMasterSymbol()
+    const assets = await getQuoteAssetsByMasterSymbol()
     assets.USDC = ['WETH']
     commit('setQuoteAssetsByMasterSymbol', assets)
   },

@@ -18,10 +18,7 @@
       <div class="c-cell-name__row">
         <img
           class="c-cell-name__icon"
-          :src="symbolImage"
-          loading="lazy"
-          width="24"
-          height="24">
+          :src="symbolImage">
         <strong v-if="assetsBySymbol[quoteAsset]">{{ assetsBySymbol[quoteAsset].name }}</strong>
         <TextPlaceholder v-else />
       </div>

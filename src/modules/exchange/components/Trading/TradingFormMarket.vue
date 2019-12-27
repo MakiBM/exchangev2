@@ -334,6 +334,7 @@ export default {
   },
 
   beforeDestroy () {
+    if (!this.isStatus(['pending'])) this.resetMarket(this.pair)
     this.cleanUp()
   },
 
@@ -349,7 +350,6 @@ export default {
       'purgeTransactions',
     ]),
     async cleanUp () {
-      if (!this.isStatus(['pending'])) this.resetMarket(this.pair)
       this.isPurging = true
       await this.purgeTransactions(this.pair)
       this.isPurging = false
